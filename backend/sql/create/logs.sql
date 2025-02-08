@@ -1,0 +1,7 @@
+-- logsテーブルMySQL作成
+CREATE TABLE logs (
+  id CHAR(36) PRIMARY KEY,
+  user_id CHAR(36) NOT NULL,
+  action VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
