@@ -20,8 +20,15 @@ const pool = mysql.createPool({
 
 app.get("/", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT NOW()");
-    res.json({ time: rows });
+    // const [rows] = await pool.query("SELECT NOW()");
+    // res.json({ time: rows });
+    // inputを含むHTMLを返す
+    res.send(`
+      <form action="/search" method="post">
+        <input type="text" name="keyword" />
+        <button type="submit">Search</button>
+      </form>
+    `);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
