@@ -18,17 +18,30 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/", async (req, res) => {
   try {
     // const [rows] = await pool.query("SELECT NOW()");
     // res.json({ time: rows });
-    // inputを含むHTMLを返す
     res.send(`
-      <form action="/search" method="post">
-        <input type="text" name="keyword" />
-        <button type="submit">Search</button>
+      <form action="/users/create" method="post">
+        <input type="text" name="name" placeholder="名前" />
+        <input type="email" name="email" placeholder="メールアドレス" />
+        <input type="password" name="password" placeholder="パスワード" />
+        <button type="submit">追加</button>
       </form>
     `);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.post("/users/create", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    // ここでフォームデータを使用できます
+    res.json({ name, email, password });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
