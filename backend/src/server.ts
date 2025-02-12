@@ -40,7 +40,13 @@ app.get("/", async (req, res) => {
 app.post("/users/create", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    // ここでフォームデータを使用できます
+    const [rows] = await pool.query("CALL createUser(?, ?, ?)", [
+      name,
+      email,
+      password,
+    ]);
+    console.log(rows);
+
     res.json({ name, email, password });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
