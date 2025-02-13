@@ -53,6 +53,44 @@ app.post("/users/create", async (req, res) => {
   }
 });
 
+app.get("/tasks", async (req, res) => {
+  try {
+    res.send(`
+      <form action="/tasks/create" method="post">
+        <input type="text" name="title" placeholder="タイトル" />
+        <input type="text" name="description" placeholder="説明" />
+        <button type="submit">追加</button>
+      </form>
+    `);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.post("/tasks/create", async (req, res) => {
+  try {
+    await pool.query("START TRANSACTION");
+
+    const [users]: [{ id: number }[]] = (await pool.query(
+      "SELECT * FROM users LIMIT 1"
+    )) as unknown as [{ id: number }[]];
+
+    const { title, description } = req.body;
+    const [rows] = await pool.query("CALL createTask(?, ?, ?)", [
+      users[0].id,
+      title,
+      description,
+    ]);
+    console.log(rows);
+
+    await pool.query("COMMIT");
+    res.json({ title, description });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
