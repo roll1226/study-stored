@@ -39,6 +39,7 @@ app.get("/", async (req, res) => {
 
 app.post("/users/create", async (req, res) => {
   try {
+    await pool.query("START TRANSACTION");
     const { name, email, password } = req.body;
     const [rows] = await pool.query("CALL createUser(?, ?, ?)", [
       name,
@@ -47,8 +48,10 @@ app.post("/users/create", async (req, res) => {
     ]);
     console.log(rows);
 
+    await pool.query("COMMIT");
     res.json({ name, email, password });
   } catch (error) {
+    await pool.query("ROLLBACK");
     res.status(500).json({ error: (error as Error).message });
   }
 });

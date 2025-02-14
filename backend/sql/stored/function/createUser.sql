@@ -12,14 +12,6 @@ BEGIN
 
   -- エラーハンドラー（エラー時にロールバックして例外をスロー）
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
-  BEGIN
-    ROLLBACK;
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Error inserting user or log';
-  END;
-
-  -- トランザクション開始
-  START TRANSACTION;
 
   -- ユーザー作成
   INSERT INTO users (name, email, password, created_at, updated_at)
@@ -31,9 +23,6 @@ BEGIN
   -- ログ作成
   INSERT INTO logs (user_id, action, created_at)
   VALUES (p_id, l_action, NOW());
-
-  -- すべて成功したらコミット
-  COMMIT;
 END //
 
 DELIMITER ;
