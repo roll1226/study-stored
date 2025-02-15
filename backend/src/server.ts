@@ -94,6 +94,16 @@ app.post("/tasks/create", async (req, res) => {
   }
 });
 
+app.get("/tasks/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query("SELECT * FROM tasks WHERE id = ?", [id]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
