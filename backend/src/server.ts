@@ -104,6 +104,32 @@ app.get("/tasks/:id", async (req, res) => {
   }
 });
 
+app.post("/tasks/:id/update", async (req, res) => {
+  try {
+    await pool.query("START TRANSACTION");
+
+    const [users]: [{ id: number }[]] = (await pool.query(
+      "SELECT * FROM users LIMIT 1"
+    )) as unknown as [{ id: number }[]];
+
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const [rows] = await pool.query("CALL updateTask(?, ?, ?)", [
+      id,
+      users[0].id,
+      title,
+      description,
+    ]);
+    console.log(rows);
+
+    await pool.query("COMMIT");
+    res.json({ title, description });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
