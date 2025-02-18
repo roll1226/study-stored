@@ -130,6 +130,22 @@ app.post("/tasks/:id/update", async (req, res) => {
   }
 });
 
+app.delete("/tasks/:id/delete", async (req, res) => {
+  try {
+    await pool.query("START TRANSACTION");
+
+    const { id } = req.params;
+    const [rows] = await pool.query("CALL deleteTask(?)", [id]);
+    console.log(rows);
+
+    await pool.query("COMMIT");
+    res.json({ id });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
