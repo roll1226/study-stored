@@ -134,8 +134,12 @@ app.delete("/tasks/:id/delete", async (req, res) => {
   try {
     await pool.query("START TRANSACTION");
 
+    const [users]: [{ id: number }[]] = (await pool.query(
+      "SELECT * FROM users LIMIT 1"
+    )) as unknown as [{ id: number }[]];
+
     const { id } = req.params;
-    const [rows] = await pool.query("CALL deleteTask(?)", [id]);
+    const [rows] = await pool.query("CALL deleteTask(?, ?)", [id, users[0].id]);
     console.log(rows);
 
     await pool.query("COMMIT");
