@@ -94,6 +94,21 @@ app.post("/tasks/create", async (req, res) => {
   }
 });
 
+app.get("/tasks", async (req, res) => {
+  try {
+    const [users]: [{ id: number }[]] = (await pool.query(
+      "SELECT * FROM users LIMIT 1"
+    )) as unknown as [{ id: number }[]];
+
+    const [rows] = await pool.query("SELECT * FROM tasks WHERE user_id = ?", [
+      users[0].id,
+    ]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.get("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
