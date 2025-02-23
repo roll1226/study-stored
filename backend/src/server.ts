@@ -56,7 +56,7 @@ app.post("/users/create", async (req, res) => {
   }
 });
 
-app.get("/tasks", async (req, res) => {
+app.get("/tasks/create", async (req, res) => {
   try {
     res.send(`
       <form action="/tasks/create" method="post">
