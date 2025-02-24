@@ -102,8 +102,24 @@ app.get("/tasks", async (req, res) => {
 
     const [rows] = await pool.query("SELECT * FROM tasks WHERE user_id = ?", [
       users[0].id,
-    ]);
-    res.json(rows);
+    ]) as unknown as [Array<{ id: number; title: string; description: string }>];
+
+    // 取得したデータをHTMLに整形
+    res.send(`
+      <ul>
+        ${rows
+          .map(
+            (row: { id: number; title: string; description: string }) =>
+              `<li>
+            <a href="/tasks/${row.id}">${row.title}</a>
+            <form action="/tasks/${row.id}/delete" method="post">
+              <button type="submit">削除</button>
+            </form>
+          </li>`
+          )
+          .join("")}
+      </ul>
+    `);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
