@@ -104,7 +104,6 @@ app.get("/tasks", async (req, res) => {
       users[0].id,
     ]) as unknown as [Array<{ id: number; title: string; description: string }>];
 
-    // 取得したデータをHTMLに整形
     res.send(`
       <ul>
         ${rows
